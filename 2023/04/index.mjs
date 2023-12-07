@@ -22,12 +22,10 @@ function part1() {
 }
 
 function part2() {
-    let total = 0;
     let cards = {};
     for(let i = 1; i <= file.length; i++){
         cards[i] = 1;
     }
-    console.log(cards);
     for (let i = 0; i < file.length; i++) {
         for(let j = 1; j <= cards[i + 1]; j++){
             let count = 0;
