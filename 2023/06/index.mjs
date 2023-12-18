@@ -1,86 +1,35 @@
 import { readFileSync } from "node:fs";
 
-const file = readFileSync("example.txt", {encoding: "utf-8" })
+const data = readFileSync("data.txt", {encoding: "utf-8" })
       .replace(/\r/g, "")
       .trim()
-      .split("\n\n")
-      .map(line => line.replace(' map', '').replace(/\x20+/g, ' ').trim().split(':')
-           .map(a => a.trim().split('\n'))
-      );
+      .split("\n");
 
-let maps = {};
-for (const map of file) {
-    maps[map[0]] = map[1].map(a => a.split(' ').map(b => parseInt(b)));
-}
-
-let seeds = {};
-for (const map of maps['seeds']) {
-    for(let seed of map){
-        seeds[seed] = {
-            seed: seed,
-            soil: seed,
-            fertilizer: seed,
-            water: seed,
-            light: seed,
-            temperature: seed,
-            humidity: seed,
-            location: seed
-        };
+function getWins(times, distances){
+    let wins = [];
+    for (let i = 0; i < times.length; i++) {
+        let winCount = 0;
+        for (let time = 1; time < times[i]; time++) {
+            if (time * (times[i] - time) > distances[i]) winCount++;
+        }
+        wins.push(winCount);
     }
+    return wins.reduce((a, n) => a * n);
 }
+
 
 function part1() {
-    for(let seed in seeds){
-        for(let map in maps){
-            if(map == 'seeds') continue;
-            let source = map.match(/^(\w+)/)[0];
-            let destination = map.match(/(\w+)$/)[0];
-            seeds[seed][destination] = seeds[seed][source];
+    let times = data[0].split(/\s+/g).slice(1);
+    let distances = data[1].split(/\s+/g).slice(1);
 
-            for(let entry of maps[map]){
-                if(seeds[seed][source] >= entry[1] &&
-                   seeds[seed][source] <= entry[1] + entry[2]){
-                    seeds[seed][destination] =
-                        seeds[seed][source] - entry[1] + entry[0];
-                    break;
-                }
-            }
-        }
-    }
-    let closest;
-    for(let seed in seeds){
-        if(seeds[seed].location < closest || closest == null)
-            closest = seeds[seed].location;
-    }
-    console.log(closest);
+    console.log(getWins(times, distances));
 }
 
 function part2() {
-    let possible = {};
-    let possibleLocations = maps['seeds'];
+    let times = data[0].split(/\s+/g).slice(1).join('');
+    let distances = data[1].split(/\s+/g).slice(1).join('');
 
-    for(let map in maps){
-        if (map == 'seeds') continue;
-
-        let source = map.match(/^(\w+)/)[0];
-        possible[source] = [];
-
-        for (let entry of maps[map]) {
-            possible[source].push(entry[1]);
-        }
-    }
-
-    maps['humidity-to-location'].forEach(map => {
-        possibleLocations.push(map[0]);
-    });
-
-    possibleLocations.push(possible['seed']);
-
-    for(let h in possible[humidity]){
-        
-    }
-
-    console.log(possible);
+    console.log(getWins([parseInt(times)],[parseInt(distances)]));
 }
 
 part1();
